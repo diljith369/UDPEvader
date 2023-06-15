@@ -24,7 +24,7 @@ UDPEvader is a platform independent custom UDP-based reverse shell agent and con
    - go build udplistener.go
 
 3. Start the listener :
-   - udplistener.exe --lport <LPORT> --prompt <YourPrompt> or 
+   - udplistener.exe --lport LPORT --prompt "YourPrompt" or 
    - udplistener.exe (In this case LPORT will be 8080 and prompt will be <<@dcrypT0R~UDP>>)
 
 4. Run the agent on your test/ victim machine , once the agent is connected, you can interact with the target machine   through the controller's listener prompts.
