@@ -7,7 +7,7 @@ import (
 
 type UDPListenerProps struct {
 	UDPPort        string
-	ShellPrmpt     string
+	ShellPrompt    string
 	AgentConn      *net.UDPConn
 	ReceivedResult []byte
 }
@@ -31,12 +31,8 @@ func (listenerprops *UDPListenerProps) ReadResultandPrint() {
 	}
 }
 
-func (listenerprops *UDPListenerProps) SetCutomControllerPrompt() string {
-	return listenerprops.ShellPrmpt
-}
-func (listenerprops *UDPListenerProps) SetDefaultControllerPrompt() string {
-	listenerprops.ShellPrmpt = "<<@dcrypT0R~UDP>>"
-	return listenerprops.ShellPrmpt
+func (listenerprops *UDPListenerProps) GetControllerPrompt() string {
+	return listenerprops.ShellPrompt
 }
 func (listenerprops *UDPListenerProps) StartUDPController() (*net.UDPConn, error) {
 	udplocaladdr, err := net.ResolveUDPAddr("udp4", listenerprops.UDPPort)

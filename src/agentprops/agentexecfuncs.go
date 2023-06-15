@@ -15,7 +15,6 @@ type UDPShellProps struct {
 	TargetUDPConn    *net.UDPConn
 	ResultToSend     []byte
 	UDPPort          string
-	ShellPrmpt       string
 	CommandToExecute string
 }
 
@@ -76,11 +75,6 @@ func (udpShellProps *UDPShellProps) StartUDPController() (*net.UDPConn, error) {
 	}
 	return udpconn, nil
 }
-
-func (udpShellProps *UDPShellProps) SetControllerPrompt() string {
-	return udpShellProps.ShellPrmpt
-}
-
 func (udpShellProps *UDPShellProps) ExecCmd() []byte {
 	command := strings.ReplaceAll(udpShellProps.CommandToExecute, "\r\n", "")
 	var osshell string
