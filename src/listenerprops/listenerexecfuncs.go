@@ -31,7 +31,11 @@ func (listenerprops *UDPListenerProps) ReadResultandPrint() {
 	}
 }
 
-func (listenerprops *UDPListenerProps) SetControllerPrompt() string {
+func (listenerprops *UDPListenerProps) SetCutomControllerPrompt() string {
+	return listenerprops.ShellPrmpt
+}
+func (listenerprops *UDPListenerProps) SetDefaultControllerPrompt() string {
+	listenerprops.ShellPrmpt = "<<@dcrypT0R~UDP>>"
 	return listenerprops.ShellPrmpt
 }
 func (listenerprops *UDPListenerProps) StartUDPController() (*net.UDPConn, error) {

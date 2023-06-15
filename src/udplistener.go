@@ -19,8 +19,8 @@ func main() {
 	cyan := color.New(color.FgHiCyan, color.Bold)
 
 	listenerprop := listenerprops.UDPListenerProps{
-		UDPPort:    ":8080",
-		ShellPrmpt: "<<@dcrypT0R~UDP>>",
+		UDPPort: ":LPORT",
+		//ShellPrmpt: "<<@dcrypT0R~UDP>>",
 	}
 	udpconn, err := listenerprop.StartUDPController()
 	if err != nil {
@@ -38,7 +38,7 @@ func main() {
 
 	for {
 
-		bl.Printf(listenerprop.SetControllerPrompt())
+		bl.Printf(listenerprop.SetDefaultControllerPrompt())
 		reader := bufio.NewReader(os.Stdin)
 		command, _ := reader.ReadString('\n')
 
