@@ -40,7 +40,6 @@ func checkerror(err error) {
 func (oUserOptions *UserOptions) UpdateSourceCode(isListener bool) {
 	oUserOptions.UpdatedSourceCode = strings.Replace(oUserOptions.DecodedSourceCode, "RHOST", oUserOptions.Rhost, 1)
 	oUserOptions.UpdatedSourceCode = strings.Replace(oUserOptions.UpdatedSourceCode, "RPORT", oUserOptions.Rport, 1)
-
 	if !isListener {
 		oUserOptions.SourceCodePath = `out` + string(os.PathSeparator) + `udptest.go`
 		if oUserOptions.TargetOS == "windows" {
@@ -49,6 +48,7 @@ func (oUserOptions *UserOptions) UpdateSourceCode(isListener bool) {
 			oUserOptions.TargetBinaryPath = `out` + string(os.PathSeparator) + oUserOptions.SaveAs
 		}
 	} else {
+		//oUserOptions.UpdatedSourceCode = strings.Replace(oUserOptions.DecodedSourceCode, "LPORT", oUserOptions.Rport, 1)
 		oUserOptions.SourceCodePath = `out` + string(os.PathSeparator) + `udptestlistener.go`
 		if oUserOptions.TargetOS == "windows" {
 			oUserOptions.TargetBinaryPath = `out` + string(os.PathSeparator) + oUserOptions.SaveAs + "listener.exe"

