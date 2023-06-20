@@ -12,8 +12,10 @@ import (
 
 type UserOptions struct {
 	AppType           string
-	TargetOS          string
-	TargetArch        string
+	AgentOS           string
+	AgentArch         string
+	ListenerOS        string
+	ListenerArch      string
 	Rhost             string
 	Rport             string
 	TargetBinaryPath  string
@@ -42,7 +44,7 @@ func (oUserOptions *UserOptions) UpdateSourceCode(isListener bool) {
 	oUserOptions.UpdatedSourceCode = strings.Replace(oUserOptions.UpdatedSourceCode, "RPORT", oUserOptions.Rport, 1)
 	if !isListener {
 		oUserOptions.SourceCodePath = `out` + string(os.PathSeparator) + `udptest.go`
-		if oUserOptions.TargetOS == "windows" {
+		if oUserOptions.AgentOS == "windows" {
 			oUserOptions.TargetBinaryPath = `out` + string(os.PathSeparator) + oUserOptions.SaveAs + ".exe"
 		} else {
 			oUserOptions.TargetBinaryPath = `out` + string(os.PathSeparator) + oUserOptions.SaveAs
@@ -50,7 +52,7 @@ func (oUserOptions *UserOptions) UpdateSourceCode(isListener bool) {
 	} else {
 		//oUserOptions.UpdatedSourceCode = strings.Replace(oUserOptions.DecodedSourceCode, "LPORT", oUserOptions.Rport, 1)
 		oUserOptions.SourceCodePath = `out` + string(os.PathSeparator) + `udptestlistener.go`
-		if oUserOptions.TargetOS == "windows" {
+		if oUserOptions.ListenerOS == "windows" {
 			oUserOptions.TargetBinaryPath = `out` + string(os.PathSeparator) + oUserOptions.SaveAs + "listener.exe"
 		} else {
 			oUserOptions.TargetBinaryPath = `out` + string(os.PathSeparator) + oUserOptions.SaveAs + "listener"
@@ -63,52 +65,65 @@ func (oUserOptions *UserOptions) CreateSourceFile() {
 	newFile.WriteString(oUserOptions.UpdatedSourceCode)
 	newFile.Close()
 }
-func (oUserOptions *UserOptions) SourceToBinary(finflag chan string) {
+func (oUserOptions *UserOptions) SourceToBinary(isListener bool, finflag chan string) {
 	binpath := oUserOptions.TargetBinaryPath + " " + oUserOptions.SourceCodePath
+	fmt.Println("building binary.....")
 	if runtime.GOOS == "linux" {
-		fmt.Println("building linux binary.....")
-		cmdpath, _ := exec.LookPath("bash")
 		var execargs string
-		if strings.ToLower(oUserOptions.AppType) == "console" {
-			execargs = "GOOS=" + oUserOptions.TargetOS + " GOARCH=" + oUserOptions.TargetArch + ` go build -ldflags="-s -w" -buildmode=exe -o ` + binpath
+		if isListener {
+			execargs = "GOOS=" + oUserOptions.ListenerOS + " GOARCH=" + oUserOptions.ListenerArch + ` go build -ldflags="-s -w" -buildmode=exe -H=windowsgui -o ` + binpath
 		} else {
-			execargs = "GOOS=" + oUserOptions.TargetOS + " GOARCH=" + oUserOptions.TargetArch + ` go build -ldflags="-s -w" -buildmode=exe -H=windowsgui -o ` + binpath
+			execargs = "GOOS=" + oUserOptions.AgentOS + " GOARCH=" + oUserOptions.AgentArch + ` go build -ldflags="-s -w" -buildmode=exe -H=windowsgui -o ` + binpath
+			if strings.ToLower(oUserOptions.AppType) == "console" {
+				execargs = "GOOS=" + oUserOptions.AgentOS + " GOARCH=" + oUserOptions.AgentArch + ` go build -ldflags="-s -w" -buildmode=exe -o ` + binpath
+			}
 		}
-		cmd := exec.Command(cmdpath, "-c", execargs)
-		res, err := cmd.CombinedOutput()
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(oUserOptions.TargetBinaryPath)
-			fmt.Println(" :Build Success !")
-		}
-		fmt.Println(string(res))
+		buildfromlinux(execargs, oUserOptions.TargetBinaryPath)
+
 	} else {
-		fmt.Println("building windows exe.....")
 		buildpath := `out` + string(os.PathSeparator) + `build.bat`
 		buildbat, err := os.Create(buildpath)
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println(buildpath)
-		buildbat.WriteString("SET GOOS=" + oUserOptions.TargetOS + "\n")
-		buildbat.WriteString("SET GOARCH=" + oUserOptions.TargetArch + "\n")
+		if isListener {
+			buildbat.WriteString("SET GOOS=" + oUserOptions.ListenerOS + "\n")
+			buildbat.WriteString("SET GOARCH=" + oUserOptions.ListenerArch + "\n")
+		} else {
+			buildbat.WriteString("SET GOOS=" + oUserOptions.AgentOS + "\n")
+			buildbat.WriteString("SET GOARCH=" + oUserOptions.AgentArch + "\n")
+		}
 		if strings.ToLower(oUserOptions.AppType) == "console" {
 			buildbat.WriteString(`go build -o -ldflags="-s -w" -buildmode=exe -o ` + binpath)
 		} else {
 			buildbat.WriteString(`go build -ldflags="-s -w" -buildmode=exe -H=windowsgui -o ` + binpath)
 		}
 		buildbat.Close()
-
-		err = exec.Command(buildpath).Run()
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(oUserOptions.TargetBinaryPath)
-			fmt.Println(" :Build Success !")
-		}
+		buildfromwindows(buildpath, oUserOptions.TargetBinaryPath)
 	}
 	finflag <- "Build Success"
+}
+func buildfromwindows(buildpath string, targetbinpath string) {
+	err := exec.Command(buildpath).Run()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Build Success !")
+		fmt.Println(targetbinpath)
+	}
+}
+func buildfromlinux(execargs string, targetbinpath string) {
+	cmdpath, _ := exec.LookPath("bash")
+	cmd := exec.Command(cmdpath, "-c", execargs)
+	res, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Build Success !")
+		fmt.Println(targetbinpath)
+	}
+	fmt.Println(string(res))
 }
 
 func (oUserOptions *UserOptions) ClearAllSource() {

