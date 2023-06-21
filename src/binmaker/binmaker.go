@@ -71,7 +71,8 @@ func (oUserOptions *UserOptions) SourceToBinary(isListener bool, finflag chan st
 	if runtime.GOOS == "linux" {
 		var execargs string
 		if isListener {
-			execargs = "GOOS=" + oUserOptions.ListenerOS + " GOARCH=" + oUserOptions.ListenerArch + ` go build -ldflags="-s -w" -buildmode=exe -H=windowsgui -o ` + binpath
+			execargs = "GOOS=" + oUserOptions.ListenerOS + " GOARCH=" + oUserOptions.ListenerArch + ` go build -ldflags="-s -w" -buildmode=exe -o ` + binpath
+			//fmt.Println(execargs)
 		} else {
 			execargs = "GOOS=" + oUserOptions.AgentOS + " GOARCH=" + oUserOptions.AgentArch + ` go build -ldflags="-s -w" -buildmode=exe -H=windowsgui -o ` + binpath
 			if strings.ToLower(oUserOptions.AppType) == "console" {
