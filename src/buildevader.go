@@ -73,9 +73,10 @@ func main() {
 	}
 
 	oDecoder := &sourcegen.Decoder{}
-
 	oDecoder.DecodeSource(sourcegen.EncodedAgent)
 	oUserOptions.DecodedSourceCode = oDecoder.DecodedSource
+	oUserOptions.CheckAndCreateOutFolder()
+	oUserOptions.ModGen()
 	oUserOptions.UpdateSourceCode(false)
 	oUserOptions.CreateSourceFile()
 	agentfinflag := make(chan string)
